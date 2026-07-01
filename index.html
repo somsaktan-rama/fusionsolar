@@ -13,6 +13,8 @@
         body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
         .chart-wrapper { position: relative; height: 50vh; min-height: 350px; width: 100%; }
         .page-hidden { display: none; }
+        /* ตกแต่ง Checkbox ให้ดูสวยงามขึ้น */
+        .site-checkbox:checked + span { color: #1e40af; font-weight: 700; }
     </style>
 </head>
 <body class="text-gray-800 min-h-screen flex flex-col">
@@ -23,8 +25,8 @@
     </script>
 
     <!-- Navbar -->
-    <nav class="bg-white shadow-sm border-b px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50">
-        <div class="flex items-center space-x-3">
+    <nav class="bg-white shadow-sm border-b px-6 py-4 flex flex-col xl:flex-row justify-between items-center gap-4 sticky top-0 z-50">
+        <div class="flex items-center space-x-3 w-full xl:w-auto justify-center xl:justify-start">
             <div class="bg-blue-600 p-2 rounded-lg text-white">
                 <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
             </div>
@@ -34,29 +36,41 @@
             </div>
         </div>
         
-        <div class="flex flex-wrap gap-3 items-center justify-center">
-            <!-- Site Filter (NEW) -->
-            <div class="flex items-center bg-blue-50 p-1.5 rounded-lg border border-blue-200">
-                <i data-lucide="map-pin" class="w-4 h-4 text-blue-600 ml-2"></i>
-                <select id="siteFilter" onchange="processAndRenderAnalytics()" class="bg-transparent border-none text-sm font-semibold text-blue-800 focus:ring-0 outline-none py-1 px-2 cursor-pointer w-32 sm:w-auto">
-                    <option value="ALL">รวมทุกไซต์ (All Sites)</option>
-                    <option value="Nakornin12kw">Nakornin12kw</option>
-                    <option value="Klong3150kw">Klong3150kw</option>
-                    <option value="Ratchapherk50kw">Ratchapherk50kw</option>
-                    <option value="Ratchapherk70kw">Ratchapherk70kw</option>
-                </select>
+        <div class="flex flex-wrap gap-3 items-center justify-center w-full xl:w-auto">
+            
+            <!-- Site Filter (เปลี่ยนเป็น Checkbox) -->
+            <div class="flex flex-wrap items-center bg-blue-50 p-2 rounded-lg border border-blue-200 gap-3 text-sm">
+                <div class="flex items-center text-blue-700 font-bold">
+                    <i data-lucide="filter" class="w-4 h-4 mr-1"></i> เปรียบเทียบไซต์:
+                </div>
+                <label class="flex items-center space-x-1 cursor-pointer select-none">
+                    <input type="checkbox" name="siteFilter" value="Nakornin12kw" onchange="processAndRenderAnalytics()" checked class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 site-checkbox">
+                    <span class="text-gray-600 transition-colors">Nakornin12kw</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer select-none">
+                    <input type="checkbox" name="siteFilter" value="Klong3150kw" onchange="processAndRenderAnalytics()" checked class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 site-checkbox">
+                    <span class="text-gray-600 transition-colors">Klong3150kw</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer select-none">
+                    <input type="checkbox" name="siteFilter" value="Ratchapherk50kw" onchange="processAndRenderAnalytics()" checked class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 site-checkbox">
+                    <span class="text-gray-600 transition-colors">Ratchapherk50kw</span>
+                </label>
+                <label class="flex items-center space-x-1 cursor-pointer select-none">
+                    <input type="checkbox" name="siteFilter" value="Ratchapherk70kw" onchange="processAndRenderAnalytics()" checked class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 site-checkbox">
+                    <span class="text-gray-600 transition-colors">Ratchapherk70kw</span>
+                </label>
             </div>
 
             <!-- Month Filter -->
-            <div class="flex items-center bg-slate-50 p-1.5 rounded-lg border border-gray-200">
-                <i data-lucide="calendar" class="w-4 h-4 text-gray-500 ml-2"></i>
-                <select id="monthFilter" onchange="processAndRenderAnalytics()" class="bg-transparent border-none text-sm font-medium text-gray-700 focus:ring-0 outline-none w-28 py-1 px-2 cursor-pointer">
+            <div class="flex items-center bg-slate-50 p-2 rounded-lg border border-gray-200">
+                <i data-lucide="calendar" class="w-4 h-4 text-gray-500 ml-1 mr-2"></i>
+                <select id="monthFilter" onchange="processAndRenderAnalytics()" class="bg-transparent border-none text-sm font-medium text-gray-700 focus:ring-0 outline-none w-28 cursor-pointer">
                     <option value="">รอข้อมูล...</option>
                 </select>
             </div>
 
             <!-- Page Menu -->
-            <div class="flex bg-slate-100 p-1 rounded-xl border">
+            <div class="flex bg-slate-100 p-1 rounded-xl border shrink-0">
                 <button onclick="switchPage('analytics')" id="nav-analytics" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm flex items-center">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i> แดชบอร์ด
                 </button>
@@ -70,7 +84,7 @@
     <!-- Page: Analytics -->
     <div id="page-analytics" class="container mx-auto px-4 py-6 max-w-7xl flex-grow">
         
-        <!-- KPI Summary (สรุปด้านบน) -->
+        <!-- KPI Summary -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500 transition-all hover:shadow-md">
                 <div class="flex justify-between items-center text-gray-500 mb-2">
@@ -109,41 +123,32 @@
             </div>
         </div>
 
-        <!-- Charts Section (แสดงแยกกัน) -->
+        <!-- Charts Section -->
         <div class="space-y-6">
-            
-            <!-- Graph 1: PV Yield -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-blue-500 rounded-full mr-2"></span> 1. กราฟพลังงานที่ผลิตได้รายวัน (PV Yield)
                 </h3>
                 <div class="chart-wrapper mt-4"><canvas id="chartYield"></canvas></div>
             </div>
-
-            <!-- Graph 2: Consumption -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-emerald-500 rounded-full mr-2"></span> 2. กราฟพลังงานที่บ้าน/อาคารใช้ไปรายวัน (Consumption)
                 </h3>
                 <div class="chart-wrapper mt-4"><canvas id="chartCons"></canvas></div>
             </div>
-            
-            <!-- Graph 3: Grid Import -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-amber-500 rounded-full mr-2"></span> 3. กราฟการดึงไฟจากการไฟฟ้ามาเสริมรายวัน (Grid Import)
                 </h3>
                 <div class="chart-wrapper mt-4"><canvas id="chartImport"></canvas></div>
             </div>
-
-            <!-- Graph 4: Specific Energy -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-purple-500 rounded-full mr-2"></span> 4. กราฟพลังงานจำเพาะรายวัน (Specific Energy)
                 </h3>
                 <div class="chart-wrapper mt-4"><canvas id="chartSpec"></canvas></div>
             </div>
-
         </div>
     </div>
 
@@ -187,10 +192,10 @@
         
         // กำหนดสีประจำไซต์งานให้คงที่
         const siteColors = {
-            'Nakornin12kw': '#3b82f6', // สีน้ำเงิน
-            'Klong3150kw': '#10b981', // สีเขียว
-            'Ratchapherk50kw': '#f59e0b', // สีส้ม
-            'Ratchapherk70kw': '#8b5cf6' // สีม่วง
+            'Nakornin12kw': '#3b82f6', 
+            'Klong3150kw': '#10b981', 
+            'Ratchapherk50kw': '#f59e0b', 
+            'Ratchapherk70kw': '#8b5cf6' 
         };
 
         function switchPage(pageId) {
@@ -248,41 +253,36 @@
             if (!rawDashboardData || rawDashboardData.length === 0) return;
 
             const selectedMonth = document.getElementById('monthFilter').value;
-            const selectedSite = document.getElementById('siteFilter').value;
+            
+            // อ่านค่าจาก Checkbox ที่ถูกเลือก
+            const checkboxes = document.querySelectorAll('input[name="siteFilter"]:checked');
+            const selectedSites = Array.from(checkboxes).map(cb => cb.value);
 
             // 1. กรองข้อมูลตามเดือน
             let monthData = rawDashboardData.filter(item => item.date.startsWith(selectedMonth));
             
-            // 2. กรองข้อมูลซ้อนด้วย Site (ถ้ามีการเลือกไซต์เฉพาะเจาะจง)
-            let filteredData = monthData;
-            if (selectedSite !== "ALL") {
-                filteredData = monthData.filter(item => item.siteName === selectedSite);
+            // 2. กรองข้อมูลซ้อนด้วย Site ที่ Checkbox ถูกเลือก
+            let filteredData = monthData.filter(item => selectedSites.includes(item.siteName));
+
+            // 3. คำนวณ KPI สรุปด้านบน
+            let sumYield = 0, sumCons = 0, sumImport = 0, sumSpec = 0, specCount = 0;
+            
+            if (selectedSites.length > 0) {
+                filteredData.forEach(item => {
+                    sumYield += item.pvYield || 0;
+                    sumCons += item.consumption || 0;
+                    sumImport += item.importGrid || 0;
+                    if (item.specificEnergy > 0) { sumSpec += item.specificEnergy; specCount++; }
+                });
             }
 
-            // 3. คำนวณ KPI สรุปด้านบนจาก filteredData
-            let sumYield = 0, sumCons = 0, sumImport = 0, sumSpec = 0, specCount = 0;
-            filteredData.forEach(item => {
-                sumYield += item.pvYield || 0;
-                sumCons += item.consumption || 0;
-                sumImport += item.importGrid || 0;
-                if (item.specificEnergy > 0) { sumSpec += item.specificEnergy; specCount++; }
-            });
-
-            // อัปเดตตัวเลขใน DOM
             document.getElementById('kpi-yield').innerHTML = `${sumYield.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-cons').innerHTML = `${sumCons.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-import').innerHTML = `${sumImport.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-spec').innerHTML = specCount > 0 ? `${(sumSpec / specCount).toFixed(2)} <span class="text-sm font-normal text-gray-500">kWh/kWp</span>` : '0.00';
 
-            // 4. เตรียมข้อมูลแกน X และ Y สำหรับสร้างกราฟ
-            // หาชุดของวันที่ทั้งหมดในเดือนนั้น (ใช้ monthData เพื่อให้แกน X คงที่เต็มเดือนเสมอ)
+            // 4. เตรียมข้อมูลแกน X และ Y
             const uniqueDates = [...new Set(monthData.map(item => item.date))].sort();
-            
-            // กำหนดไซต์ที่จะแสดงบนกราฟ
-            const displaySites = selectedSite === "ALL" 
-                ? [...new Set(rawDashboardData.map(item => item.siteName))] 
-                : [selectedSite];
-
             const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             const daysThai = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
             const chartLabels = uniqueDates.map(d => {
@@ -290,15 +290,13 @@
                 return `${parseInt(d.split('-')[2])} ${thaiMonths[parseInt(d.split('-')[1])-1]} (${daysThai[dateObj.getDay()]})`;
             });
 
-            // ฟังก์ชันตัวช่วยดึงข้อมูลเข้าแต่ละกราฟ โดยจับคู่สีให้ตรงกับไซต์
+            // ฟังก์ชันตัวช่วยดึงข้อมูลเข้าแต่ละกราฟ
             const buildDataset = (key) => {
-                return displaySites.map((site) => {
+                return selectedSites.map((site) => {
                     const data = uniqueDates.map(d => {
                         const record = filteredData.find(r => r.siteName === site && r.date === d);
                         return record ? record[key] : 0;
                     });
-                    
-                    // ใช้สีประจำไซต์ หรือสีเทาถ้าไม่มีในระบบ
                     const bgColor = siteColors[site] || '#94a3b8';
                     return { label: site, data: data, backgroundColor: bgColor, borderRadius: 3 };
                 });
@@ -313,6 +311,12 @@
         function renderChart(canvasId, instance, labels, datasets, yTitle) {
             if (window[canvasId + 'Inst']) window[canvasId + 'Inst'].destroy();
             
+            // ถ้าไม่มีข้อมูลไซต์ให้เคลียร์กราฟให้ว่าง
+            if (datasets.length === 0) {
+                window[canvasId + 'Inst'] = new Chart(document.getElementById(canvasId).getContext('2d'), {});
+                return;
+            }
+
             window[canvasId + 'Inst'] = new Chart(document.getElementById(canvasId).getContext('2d'), {
                 type: 'bar', data: { labels: labels, datasets: datasets },
                 options: {
