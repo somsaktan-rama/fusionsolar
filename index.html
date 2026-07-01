@@ -1,18 +1,13 @@
-<!DOCTYPE html>
+html_content = """<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ศูนย์วิเคราะห์พลังงานแสงอาทิตย์อัจฉริยะ</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
@@ -39,13 +34,28 @@
             </div>
         </div>
         
-        <div class="flex space-x-4 items-center">
-            <div class="flex items-center bg-slate-50 p-1.5 rounded-lg border border-gray-200">
-                <i data-lucide="calendar" class="w-4 h-4 text-gray-500 ml-2"></i>
-                <select id="monthFilter" onchange="onMonthChange()" class="bg-transparent border-none text-sm font-medium text-blue-700 focus:ring-0 outline-none w-full py-1 px-2 cursor-pointer">
-                    <option value="">กำลังโหลดข้อมูล...</option>
+        <div class="flex flex-wrap gap-3 items-center justify-center">
+            <!-- Site Filter (NEW) -->
+            <div class="flex items-center bg-blue-50 p-1.5 rounded-lg border border-blue-200">
+                <i data-lucide="map-pin" class="w-4 h-4 text-blue-600 ml-2"></i>
+                <select id="siteFilter" onchange="processAndRenderAnalytics()" class="bg-transparent border-none text-sm font-semibold text-blue-800 focus:ring-0 outline-none py-1 px-2 cursor-pointer w-32 sm:w-auto">
+                    <option value="ALL">รวมทุกไซต์ (All Sites)</option>
+                    <option value="Nakornin12kw">Nakornin12kw</option>
+                    <option value="Klong3150kw">Klong3150kw</option>
+                    <option value="Ratchapherk50kw">Ratchapherk50kw</option>
+                    <option value="Ratchapherk70kw">Ratchapherk70kw</option>
                 </select>
             </div>
+
+            <!-- Month Filter -->
+            <div class="flex items-center bg-slate-50 p-1.5 rounded-lg border border-gray-200">
+                <i data-lucide="calendar" class="w-4 h-4 text-gray-500 ml-2"></i>
+                <select id="monthFilter" onchange="processAndRenderAnalytics()" class="bg-transparent border-none text-sm font-medium text-gray-700 focus:ring-0 outline-none w-28 py-1 px-2 cursor-pointer">
+                    <option value="">รอข้อมูล...</option>
+                </select>
+            </div>
+
+            <!-- Page Menu -->
             <div class="flex bg-slate-100 p-1 rounded-xl border">
                 <button onclick="switchPage('analytics')" id="nav-analytics" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm flex items-center">
                     <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i> แดชบอร์ด
@@ -62,40 +72,40 @@
         
         <!-- KPI Summary (สรุปด้านบน) -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500 transition-all hover:shadow-md">
                 <div class="flex justify-between items-center text-gray-500 mb-2">
                     <span class="text-xs font-bold uppercase">Total PV Yield</span>
                     <i data-lucide="sun" class="w-4 h-4 text-blue-500"></i>
                 </div>
                 <div class="text-2xl font-bold text-gray-800" id="kpi-yield">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
-                <p class="text-[10px] text-gray-400 mt-1">ผลรวมพลังงานที่ผลิตได้ในเดือนนี้</p>
+                <p class="text-[10px] text-gray-400 mt-1">พลังงานที่ผลิตได้ทั้งหมดตามตัวกรอง</p>
             </div>
             
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
                 <div class="flex justify-between items-center text-gray-500 mb-2">
                     <span class="text-xs font-bold uppercase">Total Consumption</span>
                     <i data-lucide="home" class="w-4 h-4 text-emerald-500"></i>
                 </div>
                 <div class="text-2xl font-bold text-gray-800" id="kpi-cons">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
-                <p class="text-[10px] text-gray-400 mt-1">ผลรวมพลังงานที่ใช้ไปในเดือนนี้</p>
+                <p class="text-[10px] text-gray-400 mt-1">พลังงานที่ใช้ไปทั้งหมดตามตัวกรอง</p>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500 transition-all hover:shadow-md">
                 <div class="flex justify-between items-center text-gray-500 mb-2">
                     <span class="text-xs font-bold uppercase">Total Grid Import</span>
                     <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
                 </div>
                 <div class="text-2xl font-bold text-gray-800" id="kpi-import">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
-                <p class="text-[10px] text-gray-400 mt-1">ผลรวมการดึงไฟจากการไฟฟ้าในเดือนนี้</p>
+                <p class="text-[10px] text-gray-400 mt-1">การดึงไฟจากการไฟฟ้ามาเสริมรวม</p>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-purple-500">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-purple-500 transition-all hover:shadow-md">
                 <div class="flex justify-between items-center text-gray-500 mb-2">
                     <span class="text-xs font-bold uppercase">Avg Specific Energy</span>
                     <i data-lucide="bar-chart" class="w-4 h-4 text-purple-500"></i>
                 </div>
                 <div class="text-2xl font-bold text-gray-800" id="kpi-spec">0.00 <span class="text-sm font-normal text-gray-500">kWh/kWp</span></div>
-                <p class="text-[10px] text-gray-400 mt-1">ค่าเฉลี่ยประสิทธิภาพแผงในเดือนนี้</p>
+                <p class="text-[10px] text-gray-400 mt-1">ค่าเฉลี่ยประสิทธิภาพแผงตามตัวกรอง</p>
             </div>
         </div>
 
@@ -107,8 +117,7 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-blue-500 rounded-full mr-2"></span> 1. กราฟพลังงานที่ผลิตได้รายวัน (PV Yield)
                 </h3>
-                <p class="text-xs text-gray-400 mb-4">* สามารถคลิกที่ชื่อไซต์ด้านล่างเพื่อเปิด/ปิดกราฟ (วันหยุดเสาร์-อาทิตย์จะแสดงแกนวันที่เป็นสีแดง)</p>
-                <div class="chart-wrapper"><canvas id="chartYield"></canvas></div>
+                <div class="chart-wrapper mt-4"><canvas id="chartYield"></canvas></div>
             </div>
 
             <!-- Graph 2: Consumption -->
@@ -116,8 +125,7 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-emerald-500 rounded-full mr-2"></span> 2. กราฟพลังงานที่บ้าน/อาคารใช้ไปรายวัน (Consumption)
                 </h3>
-                <p class="text-xs text-gray-400 mb-4">* เปรียบเทียบปริมาณการใช้ไฟฟ้าของแต่ละไซต์</p>
-                <div class="chart-wrapper"><canvas id="chartCons"></canvas></div>
+                <div class="chart-wrapper mt-4"><canvas id="chartCons"></canvas></div>
             </div>
             
             <!-- Graph 3: Grid Import -->
@@ -125,8 +133,7 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-amber-500 rounded-full mr-2"></span> 3. กราฟการดึงไฟจากการไฟฟ้ามาเสริมรายวัน (Grid Import)
                 </h3>
-                <p class="text-xs text-gray-400 mb-4">* แสดงปริมาณไฟฟ้าที่ต้องซื้อเพิ่มจากการไฟฟ้า</p>
-                <div class="chart-wrapper"><canvas id="chartImport"></canvas></div>
+                <div class="chart-wrapper mt-4"><canvas id="chartImport"></canvas></div>
             </div>
 
             <!-- Graph 4: Specific Energy -->
@@ -134,8 +141,7 @@
                 <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
                     <span class="w-2 h-5 bg-purple-500 rounded-full mr-2"></span> 4. กราฟพลังงานจำเพาะรายวัน (Specific Energy)
                 </h3>
-                <p class="text-xs text-gray-400 mb-4">* แสดงประสิทธิภาพการผลิตต่อ 1 กิโลวัตต์ติดตั้ง (ยิ่งสูงยิ่งดี)</p>
-                <div class="chart-wrapper"><canvas id="chartSpec"></canvas></div>
+                <div class="chart-wrapper mt-4"><canvas id="chartSpec"></canvas></div>
             </div>
 
         </div>
@@ -160,7 +166,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">เลือกไฟล์รายงาน Excel</label>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">เลือกไฟล์รายงาน Excel (แบบ by Plant)</label>
                     <div id="dropzone" class="border-2 border-dashed border-gray-300 bg-slate-50 hover:bg-slate-100 rounded-xl p-6 flex flex-col items-center justify-center relative">
                         <i data-lucide="cloud-lightning" class="w-8 h-8 text-gray-400 mb-2"></i>
                         <span class="text-xs text-gray-500 text-center">คลิกที่นี่เพื่อเลือกไฟล์</span>
@@ -178,7 +184,14 @@
     <script>
         let chartYieldInst = null, chartConsInst = null, chartImportInst = null, chartSpecInst = null;
         let rawDashboardData = [];
-        const themeColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+        
+        // กำหนดสีประจำไซต์งานให้คงที่
+        const siteColors = {
+            'Nakornin12kw': '#3b82f6', // สีน้ำเงิน
+            'Klong3150kw': '#10b981', // สีเขียว
+            'Ratchapherk50kw': '#f59e0b', // สีส้ม
+            'Ratchapherk70kw': '#8b5cf6' // สีม่วง
+        };
 
         function switchPage(pageId) {
             ['analytics', 'upload'].forEach(p => {
@@ -231,15 +244,22 @@
             else selector.value = months[0];
         }
 
-        function onMonthChange() { processAndRenderAnalytics(); }
-
         function processAndRenderAnalytics() {
             if (!rawDashboardData || rawDashboardData.length === 0) return;
 
             const selectedMonth = document.getElementById('monthFilter').value;
-            const filteredData = rawDashboardData.filter(item => item.date.startsWith(selectedMonth));
+            const selectedSite = document.getElementById('siteFilter').value;
 
-            // คำนวณ KPI สรุปด้านบน
+            // 1. กรองข้อมูลตามเดือน
+            let monthData = rawDashboardData.filter(item => item.date.startsWith(selectedMonth));
+            
+            // 2. กรองข้อมูลซ้อนด้วย Site (ถ้ามีการเลือกไซต์เฉพาะเจาะจง)
+            let filteredData = monthData;
+            if (selectedSite !== "ALL") {
+                filteredData = monthData.filter(item => item.siteName === selectedSite);
+            }
+
+            // 3. คำนวณ KPI สรุปด้านบนจาก filteredData
             let sumYield = 0, sumCons = 0, sumImport = 0, sumSpec = 0, specCount = 0;
             filteredData.forEach(item => {
                 sumYield += item.pvYield || 0;
@@ -248,14 +268,20 @@
                 if (item.specificEnergy > 0) { sumSpec += item.specificEnergy; specCount++; }
             });
 
+            // อัปเดตตัวเลขใน DOM
             document.getElementById('kpi-yield').innerHTML = `${sumYield.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-cons').innerHTML = `${sumCons.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-import').innerHTML = `${sumImport.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
             document.getElementById('kpi-spec').innerHTML = specCount > 0 ? `${(sumSpec / specCount).toFixed(2)} <span class="text-sm font-normal text-gray-500">kWh/kWp</span>` : '0.00';
 
-            // เตรียมแกน X (วันที่ และ วันหยุด)
-            const uniqueDates = [...new Set(filteredData.map(item => item.date))].sort();
-            const uniqueSites = [...new Set(rawDashboardData.map(item => item.siteName))];
+            // 4. เตรียมข้อมูลแกน X และ Y สำหรับสร้างกราฟ
+            // หาชุดของวันที่ทั้งหมดในเดือนนั้น (ใช้ monthData เพื่อให้แกน X คงที่เต็มเดือนเสมอ)
+            const uniqueDates = [...new Set(monthData.map(item => item.date))].sort();
+            
+            // กำหนดไซต์ที่จะแสดงบนกราฟ
+            const displaySites = selectedSite === "ALL" 
+                ? [...new Set(rawDashboardData.map(item => item.siteName))] 
+                : [selectedSite];
 
             const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             const daysThai = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
@@ -264,14 +290,17 @@
                 return `${parseInt(d.split('-')[2])} ${thaiMonths[parseInt(d.split('-')[1])-1]} (${daysThai[dateObj.getDay()]})`;
             });
 
-            // ฟังก์ชันตัวช่วยดึงข้อมูลเข้าแต่ละกราฟ
+            // ฟังก์ชันตัวช่วยดึงข้อมูลเข้าแต่ละกราฟ โดยจับคู่สีให้ตรงกับไซต์
             const buildDataset = (key) => {
-                return uniqueSites.map((site, idx) => {
+                return displaySites.map((site) => {
                     const data = uniqueDates.map(d => {
                         const record = filteredData.find(r => r.siteName === site && r.date === d);
                         return record ? record[key] : 0;
                     });
-                    return { label: site, data: data, backgroundColor: themeColors[idx % themeColors.length], borderRadius: 3 };
+                    
+                    // ใช้สีประจำไซต์ หรือสีเทาถ้าไม่มีในระบบ
+                    const bgColor = siteColors[site] || '#94a3b8';
+                    return { label: site, data: data, backgroundColor: bgColor, borderRadius: 3 };
                 });
             };
 
@@ -348,4 +377,9 @@
         window.onload = () => { lucide.createIcons(); fetchDataFromGAS(); };
     </script>
 </body>
-</html>
+</html>"""
+
+with open("index-v5.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("HTML file successfully generated for Option B.")
