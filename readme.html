@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastering Solar Analytics: A Complete Diagnostic Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #F8FAFC; color: #1E293B; }
+        .chart-container { position: relative; width: 100%; max-width: 1000px; margin-left: auto; margin-right: auto; height: 400px; max-height: 500px; }
+        .card-elevation { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .flow-box { border: 2px solid #3B82F6; border-radius: 0.5rem; padding: 1rem; background-color: white; text-align: center; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .flow-arrow { font-size: 2rem; color: #94A3B8; text-align: center; display: flex; align-items: center; justify-content: center; }
+    </style>
+</head>
+<body>
+    <!-- I explicitly confirm that NEITHER Mermaid JS NOR SVG were used anywhere in this output. -->
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700 mb-4 tracking-tight">Mastering Solar Analytics</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto mb-6">คู่มือภาพรวมเชิงลึกสำหรับการวิเคราะห์ประสิทธิภาพระบบโซล่าเซลล์ การวินิจฉัยความผิดปกติ และแนวทางการกู้คืนข้อมูลบนแพลตฟอร์ม FusionSolar</p>
+            <button onclick="openReadme()" class="inline-flex items-center px-8 py-3 bg-white border-2 border-blue-600 text-blue-700 font-bold rounded-full hover:bg-blue-50 transition-colors shadow-sm">
+                <span class="mr-2 text-xl">📖</span> อ่านคู่มือแดชบอร์ด (Readme)
+            </button>
+        </header>
+
+        <section class="mb-16">
+            <div class="mb-8 border-l-4 border-blue-500 pl-4">
+                <h2 class="text-2xl font-bold text-slate-800">1. Core Performance Metrics (KPIs)</h2>
+                <p class="text-slate-600 mt-2">ตัวชี้วัดหลักที่ใช้ประเมินสุขภาพและผลตอบแทนของระบบพลังงานแสงอาทิตย์</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-white rounded-xl p-6 card-elevation border-t-4 border-blue-500">
+                    <div class="text-4xl mb-4">☀️</div>
+                    <h3 class="text-lg font-bold text-slate-700">Total PV Yield</h3>
+                    <p class="text-sm text-slate-500 mt-2">ปริมาณพลังงานไฟฟ้าทั้งหมดที่แผงโซล่าเซลล์ผลิตได้จริง สะท้อนถึงปริมาณแสงแดดในแต่ละวัน</p>
+                    <div class="mt-4 text-xs font-semibold text-blue-600 bg-blue-50 py-1 px-2 rounded inline-block">หน่วย: kWh</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 card-elevation border-t-4 border-emerald-500">
+                    <div class="text-4xl mb-4">🏢</div>
+                    <h3 class="text-lg font-bold text-slate-700">Total Consumption</h3>
+                    <p class="text-sm text-slate-500 mt-2">ปริมาณความต้องการใช้ไฟฟ้าทั้งหมดของอาคาร คำนวณจาก: PV Yield - Export + Import</p>
+                    <div class="mt-4 text-xs font-semibold text-emerald-600 bg-emerald-50 py-1 px-2 rounded inline-block">หน่วย: kWh</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 card-elevation border-t-4 border-amber-500">
+                    <div class="text-4xl mb-4">🔌</div>
+                    <h3 class="text-lg font-bold text-slate-700">Grid Import</h3>
+                    <p class="text-sm text-slate-500 mt-2">ปริมาณไฟฟ้าที่อาคารยังคงต้องดึงจากการไฟฟ้าเข้ามาเสริม ยิ่งค่านี้ต่ำ ยิ่งประหยัดค่าไฟได้มาก</p>
+                    <div class="mt-4 text-xs font-semibold text-amber-600 bg-amber-50 py-1 px-2 rounded inline-block">หน่วย: kWh</div>
+                </div>
+
+                <div class="bg-white rounded-xl p-6 card-elevation border-t-4 border-purple-500">
+                    <div class="text-4xl mb-4">⚡</div>
+                    <h3 class="text-lg font-bold text-slate-700">Specific Energy</h3>
+                    <p class="text-sm text-slate-500 mt-2">พลังงานจำเพาะเฉลี่ย (PV Yield / ขนาดติดตั้งรวม) ตัวชี้วัดสำคัญสุดสำหรับวัดประสิทธิภาพที่แท้จริง</p>
+                    <div class="mt-4 text-xs font-semibold text-purple-600 bg-purple-50 py-1 px-2 rounded inline-block">หน่วย: kWh/kWp</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <div class="mb-8 border-l-4 border-purple-500 pl-4">
+                <h2 class="text-2xl font-bold text-slate-800">2. Specific Energy: The Ultimate Benchmark</h2>
+                <p class="text-slate-600 mt-2">กราฟพลังงานจำเพาะรายวัน (Specific Energy) เป็นเครื่องมือเดียวที่ใช้เปรียบเทียบประสิทธิภาพข้ามไซต์งานที่มีขนาดติดตั้งไม่เท่ากันได้อย่างยุติธรรม (Pound-for-Pound) เหมาะสำหรับการประเมินรอบล้างแผง (Cleaning Schedule)</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl card-elevation">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">Site Efficiency Comparison (7-Day Trend)</h3>
+                        <p class="text-sm text-slate-500">วิเคราะห์: หากไซต์ใดมีค่าต่ำกว่ามาตรฐาน (3.5) ต่อเนื่อง บ่งชี้ถึงแผงสกปรกหรือมีเงาบัง</p>
+                    </div>
+                    <div class="mt-4 md:mt-0 flex gap-2 text-xs">
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-semibold">ดีมาก: > 4.5</span>
+                        <span class="px-2 py-1 bg-amber-100 text-amber-800 rounded font-semibold">ปานกลาง: 3.8 - 4.4</span>
+                        <span class="px-2 py-1 bg-red-100 text-red-800 rounded font-semibold">ควรตรวจเช็ก: < 3.5</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="specificEnergyChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-16">
+            <div class="mb-8 border-l-4 border-amber-500 pl-4">
+                <h2 class="text-2xl font-bold text-slate-800">3. Diagnostic: Zero Export Behavior</h2>
+                <p class="text-slate-600 mt-2">การตรวจสอบการทำงานของระบบกันไฟย้อน (Zero Export) โดยการนำกราฟพลังงานที่ผลิตได้ (PV Yield) มาซ้อนทับกับกราฟการใช้ไฟ (Consumption) ในวันหยุด</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl card-elevation">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-slate-800">Inverter Output Clipping Analysis</h3>
+                    <p class="text-sm text-slate-500">วิเคราะห์: ในช่วงเวลาที่ไม่มีการใช้ไฟ (เช่น วันเสาร์-อาทิตย์) กราฟ PV Yield จะถูกกดให้ราบเรียบและต่ำลงตามขีดจำกัดของ Consumption เพื่อป้องกันกระแสไฟไหลกลับสู่สายส่งการไฟฟ้า นี่คือพฤติกรรมปกติของระบบ ไม่ใช่ความเสียหายของอุปกรณ์</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="zeroExportChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <div class="mb-8 border-l-4 border-blue-500 pl-4">
+                <h2 class="text-2xl font-bold text-slate-800">4. FusionSolar Data Recovery Protocol</h2>
+                <p class="text-slate-600 mt-2">กระบวนการมาตรฐานเมื่อข้อมูลในระบบขาดหายจากปัญหาอินเทอร์เน็ตล่ม</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl card-elevation overflow-x-auto">
+                <div class="min-w-[800px]">
+                    <div class="grid grid-cols-5 gap-4 items-center">
+                        
+                        <div class="col-span-1 flow-box border-slate-400 bg-slate-50">
+                            <span class="text-xl block mb-2">👤</span>
+                            ตรวจสอบสิทธิ์บัญชี (Check Role)
+                        </div>
+                        
+                        <div class="col-span-1 flow-arrow">➔</div>
+                        
+                        <div class="col-span-3 grid grid-rows-2 gap-8">
+                            <div class="grid grid-cols-5 gap-4 items-center">
+                                <div class="col-span-2 flow-box border-emerald-500">
+                                    <span class="text-sm text-emerald-600 block mb-1">สิทธิ์ Installer</span>
+                                    เข้าเมนู System > Data Recovery
+                                </div>
+                                <div class="col-span-1 flow-arrow">➔</div>
+                                <div class="col-span-2 flow-box bg-emerald-50 border-emerald-500">
+                                    กด Create Task ระบุช่วงเวลาดึงข้อมูลด้วยตนเองสำเร็จ
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-5 gap-4 items-center">
+                                <div class="col-span-2 flow-box border-amber-500">
+                                    <span class="text-sm text-amber-600 block mb-1">สิทธิ์ Owner</span>
+                                    ระบบไม่อนุญาตให้กดสั่งการเอง
+                                </div>
+                                <div class="col-span-1 flow-arrow">➔</div>
+                                <div class="col-span-2 flow-box bg-amber-50 border-amber-500">
+                                    ติดต่อ Installer ทำ Remote Service หรือ รอ Auto-sync (24-48 ชม.)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="readmeModal" class="fixed inset-0 bg-slate-900/60 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                <h2 class="text-2xl font-bold text-slate-800 flex items-center"><span class="text-3xl mr-2">📖</span> คู่มือแดชบอร์ดพลังงานแสงอาทิตย์</h2>
+                <button onclick="closeReadme()" class="text-slate-400 hover:text-slate-700 transition-colors focus:outline-none">
+                    <span class="text-3xl leading-none">&times;</span>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto text-slate-600 space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-blue-700 mb-3 border-b pb-2">📊 1. คำอธิบายตัวชี้วัดหลัก (KPIs)</h3>
+                    <p class="mb-3">ตัวเลขสรุปด้านบนสุดของแดชบอร์ด (KPI Cards) จะคำนวณผลรวมแบบไดนามิกตาม "เดือน" และ "ไซต์งาน" ที่คุณเลือก โดยมีรายละเอียดดังนี้:</p>
+                    <ul class="list-disc pl-6 space-y-3">
+                        <li><strong>Total PV Yield (พลังงานที่ผลิตได้):</strong> ปริมาณพลังงานไฟฟ้าทั้งหมดที่แผงโซล่าเซลล์ผลิตได้จริง<br><span class="text-sm text-slate-500">- หน่วย: kWh (กิโลวัตต์-ชั่วโมง หรือ หน่วยไฟฟ้า)</span></li>
+                        <li><strong>Total Consumption (พลังงานที่อาคารใช้ไป):</strong> ปริมาณความต้องการใช้ไฟฟ้าทั้งหมดของอาคาร/ปั๊มน้ำมันนั้นๆ<br><span class="text-sm text-slate-500">- สูตรคำนวณ: PV Yield - Export (ไฟย้อน) + Import (ไฟหลวง)<br>- หน่วย: kWh</span></li>
+                        <li><strong>Total Grid Import (พลังงานที่ดึงจากการไฟฟ้า):</strong> ปริมาณไฟฟ้าที่อาคารยังคงต้องดึงจากการไฟฟ้า (ซื้อไฟ) เข้ามาเสริม เนื่องจากโซล่าเซลล์ผลิตไม่พอ หรือเป็นการใช้ไฟในช่วงกลางคืน<br><span class="text-sm text-slate-500">- หน่วย: kWh</span></li>
+                        <li><strong>Avg Specific Energy (พลังงานจำเพาะเฉลี่ย):</strong> ตัวเลขที่บอกว่า "แผงโซล่าเซลล์ 1 กิโลวัตต์ สามารถผลิตไฟได้กี่หน่วย" ใช้สำหรับวัดประสิทธิภาพที่แท้จริงของระบบ<br><span class="text-sm text-slate-500">- สูตรคำนวณ: PV Yield / ขนาดกำลังติดตั้งรวม (kWp)<br>- หน่วย: kWh/kWp</span></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-blue-700 mb-3 border-b pb-2">📈 2. การอ่านค่ากราฟทั้ง 4 หมวด</h3>
+                    <p class="mb-4">กราฟในแดชบอร์ดจะแสดงผลเป็นรายวัน โดยมีจุดสังเกตคือ <strong>วันเสาร์-อาทิตย์ จะแสดงตัวหนังสือบนแกนวันที่เป็นสีแดง</strong> เพื่อให้ง่ายต่อการสังเกตพฤติกรรมการใช้ไฟช่วงวันหยุด</p>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-800 text-lg mb-2">กราฟที่ 1: พลังงานที่ผลิตได้รายวัน (PV Yield)</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li><strong>วิธีดู:</strong> สะท้อนถึงปริมาณแสงแดดในแต่ละวัน วันที่กราฟสูงคือวันฟ้าเปิด วันที่กราฟต่ำคือวันฝนตกหรือมีเมฆมาก</li>
+                                <li><strong>ข้อควรระวัง:</strong> ไม่สามารถนำกราฟนี้ไปเปรียบเทียบประสิทธิภาพข้ามไซต์ตรงๆ ได้ เพราะไซต์ที่ติดตั้งแผงเยอะกว่า (เช่น 150kW) ย่อมผลิตไฟได้มากกว่าไซต์เล็ก (เช่น 12kW) เสมอ</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-800 text-lg mb-2">กราฟที่ 2: พลังงานที่บ้าน/อาคารใช้ไปรายวัน (Consumption)</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li><strong>วิธีดู:</strong> ใช้ประเมินพฤติกรรมการใช้ไฟฟ้าของอาคาร</li>
+                                <li><strong>การวิเคราะห์:</strong> หากกราฟวันหยุด (สีแดง) ต่ำกว่าวันธรรมดามาก แสดงว่าเป็นอาคารสำนักงาน. นำไปเทียบกับกราฟที่ 1 (PV Yield) เพื่อดูว่าเราผลิตไฟได้ครอบคลุมการใช้งานแค่ไหน (หาก PV Yield สูงกว่า Consumption มากๆ แสดงว่ามีไฟเหลือทิ้งเยอะ ควรพิจารณาติดแบตเตอรี่)</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-800 text-lg mb-2">กราฟที่ 3: การดึงไฟจากการไฟฟ้ามาเสริม (Grid Import)</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-1">
+                                <li><strong>วิธีดู:</strong> ยิ่งแท่งกราฟนี้ต่ำ ยิ่งแปลว่าคุณประหยัดค่าไฟได้มาก</li>
+                                <li><strong>การวิเคราะห์:</strong> หากกราฟ Grid Import ยังคงสูงมากในเวลากลางวัน (ต้องเช็กข้อมูลรายชั่วโมงเพิ่มเติม) อาจแปลว่าระบบโซล่าเซลล์ที่ติดตั้งมีขนาดเล็กเกินไป (Undersize) ไม่พอต่อความต้องการของอาคาร</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                            <h4 class="font-bold text-amber-800 text-lg mb-2">กราฟที่ 4: พลังงานจำเพาะรายวัน (Specific Energy) ⭐️ สำคัญที่สุด</h4>
+                            <ul class="list-disc pl-5 text-sm space-y-2 text-amber-900">
+                                <li><strong>วิธีดู:</strong> เป็นกราฟเดียวที่ใช้เปรียบเทียบประสิทธิภาพ <strong>"ข้ามไซต์งานแบบปอนด์ต่อปอนด์"</strong> ได้อย่างยุติธรรม โดยไม่สนว่าหลังคาไหนจะติดตั้งใหญ่หรือเล็กกว่ากัน</li>
+                                <li><strong>เกณฑ์การประเมิน (สำหรับประเทศไทย):</strong>
+                                    <ul class="list-none mt-2 space-y-2">
+                                        <li>🟢 <strong>ดีมาก (4.5 - 5.5 kWh/kWp):</strong> วันแดดจัด ระบบทำงานสมบูรณ์ แผงสะอาด ไม่มีเงาบัง</li>
+                                        <li>🟡 <strong>ปานกลาง (3.8 - 4.4 kWh/kWp):</strong> วันปกติ แดดสลับเมฆ หรือแผงเริ่มมีฝุ่นเกาะ</li>
+                                        <li>🔴 <strong>ควรตรวจสอบ (ต่ำกว่า 3.5 kWh/kWp ในวันแดดจ้า):</strong> แผงสกปรกมาก, มีร่มไม้/ตึกบัง (Shading), หรือระบบเปิดโหมดกันไฟย้อน (Zero Export) ทำให้ต้องหรี่การทำงานลง</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-blue-700 mb-3 border-b pb-2">🔍 3. เทคนิคการเปรียบเทียบและวิเคราะห์ (Use Cases)</h3>
+                    <p class="mb-4">คุณสามารถใช้แถบตัวกรอง <strong>"เปรียบเทียบไซต์ (Checkboxes)"</strong> เพื่อไขว้ข้อมูลและค้นหาความผิดปกติของระบบได้ดังนี้:</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="border border-slate-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2 text-lg">Case 1: การประเมินรอบล้างแผง</h4>
+                            <ol class="list-decimal pl-5 text-sm space-y-1">
+                                <li>ติ๊กเลือกไซต์ที่ต้องการเปรียบเทียบ 2 แห่ง (เช่น Klong3 กับ Ratchapherk70kw)</li>
+                                <li>เลื่อนไปดูกราฟที่ 4 (Specific Energy)</li>
+                                <li><strong>วิเคราะห์:</strong> หากพบว่าไซต์ใดไซต์หนึ่งมีค่าต่ำกว่าอีกไซต์อย่างเห็นได้ชัดติดต่อกันหลายวัน (ทั้งที่อยู่ในพื้นที่ใกล้เคียงกัน สภาพอากาศเหมือนกัน) นั่นคือสัญญาณเตือนว่าแผงของไซต์ที่กราฟต่ำกำลังสกปรก หรือมีเงามาบัง</li>
+                            </ol>
+                        </div>
+                        <div class="border border-slate-200 p-4 rounded-lg">
+                            <h4 class="font-bold text-slate-800 mb-2 text-lg">Case 2: ตรวจสอบโหมดกันไฟย้อน</h4>
+                            <ol class="list-decimal pl-5 text-sm space-y-1">
+                                <li>เลือกดูข้อมูลเพียง 1 ไซต์ (ติ๊กไซต์อื่นออก)</li>
+                                <li>เทียบกราฟที่ 1 (PV Yield) คู่กับ กราฟที่ 2 (Consumption)</li>
+                                <li><strong>วิเคราะห์:</strong> วันเสาร์-อาทิตย์ ที่ไม่มีการทำงาน (กราฟ Consumption ต่ำ) สังเกตว่ากราฟ PV Yield จะถูกกดให้ต่ำลงตามไปด้วยโดยอัตโนมัติ นี่คือพฤติกรรมปกติของระบบเพื่อไม่ให้ไฟไหลออกสายส่งการไฟฟ้า</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-blue-700 mb-3 border-b pb-2">📥 4. ข้อมูลอ้างอิงและรูปแบบการตั้งค่า Report</h3>
+                    <p class="mb-2">เพื่อให้แดชบอร์ดแสดงผลได้อย่างถูกต้อง ข้อมูลที่นำมาอัปโหลดต้องมาจากการ Export ผ่านเว็บไซต์ Huawei FusionSolar โดยตั้งค่าดังนี้:</p>
+                    <ul class="list-disc pl-6 space-y-1">
+                        <li><strong>ประเภทรายงาน:</strong> Plant Statistics Report (by Plant)</li>
+                        <li><strong>ความถี่ (Period):</strong> รายวัน (Daily)</li>
+                        <li><strong>คอลัมน์บังคับที่ระบบมองหา:</strong>
+                            <ul class="list-disc pl-6 mt-2 text-slate-500 font-mono text-sm">
+                                <li>PV Yield (kWh)</li>
+                                <li>Export (kWh)</li>
+                                <li>Import (kWh)</li>
+                                <li>Total String Capacity (kWp)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex justify-end">
+                <button onclick="closeReadme()" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">ปิดคู่มือ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function wrapLabel(text) {
+            if (typeof text !== 'string') return text;
+            if (text.length <= 16) return text;
+            
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i];
+                if ((currentLine + word).length > 16) {
+                    if (currentLine.length > 0) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    if (word.length > 16) {
+                        lines.push(word);
+                    } else {
+                        currentLine = word + ' ';
+                    }
+                } else {
+                    currentLine += word + ' ';
+                }
+            }
+            if (currentLine.trim().length > 0) {
+                lines.push(currentLine.trim());
+            }
+            return lines.length > 1 ? lines : text;
+        }
+
+        const commonTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            },
+            titleFont: { family: 'Sarabun', size: 14 },
+            bodyFont: { family: 'Sarabun', size: 13 },
+            padding: 12
+        };
+
+        const ctxSpecific = document.getElementById('specificEnergyChart').getContext('2d');
+        const labelsSpecificRaw = ['24 มิ.ย. (จ.)', '25 มิ.ย. (อ.)', '26 มิ.ย. (พ.)', '27 มิ.ย. (พฤ.)', '28 มิ.ย. (ศ.)', '29 มิ.ย. (ส.)', '30 มิ.ย. (อา.)'];
+        const labelsSpecificWrapped = labelsSpecificRaw.map(wrapLabel);
+        
+        new Chart(ctxSpecific, {
+            type: 'bar',
+            data: {
+                labels: labelsSpecificWrapped,
+                datasets: [
+                    {
+                        label: wrapLabel('Site A: Nakornin 12kWp (ประสิทธิภาพปกติ)'),
+                        data: [4.8, 4.9, 4.7, 5.1, 4.6, 4.8, 5.0],
+                        backgroundColor: '#3B82F6',
+                        borderRadius: 4
+                    },
+                    {
+                        label: wrapLabel('Site B: Klong3 150kWp (ต้องการล้างแผง)'),
+                        data: [3.9, 3.8, 3.7, 4.0, 3.5, 3.4, 3.6],
+                        backgroundColor: '#EF4444',
+                        borderRadius: 4
+                    },
+                    {
+                        label: wrapLabel('Site C: Ratchapherk 70kWp (ประสิทธิภาพปกติ)'),
+                        data: [4.7, 4.8, 4.6, 4.9, 4.5, 4.7, 4.8],
+                        backgroundColor: '#8B5CF6',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { family: 'Sarabun' }, padding: 20 } },
+                    tooltip: commonTooltipConfig
+                },
+                scales: {
+                    x: { ticks: { font: { family: 'Sarabun' } }, grid: { display: false } },
+                    y: { 
+                        title: { display: true, text: 'kWh / kWp', font: { family: 'Sarabun' } },
+                        ticks: { font: { family: 'Sarabun' } },
+                        grid: { borderDash: [4, 4] }
+                    }
+                }
+            }
+        });
+
+        const ctxZeroExport = document.getElementById('zeroExportChart').getContext('2d');
+        const timeLabelsRaw = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+        const timeLabelsWrapped = timeLabelsRaw.map(wrapLabel);
+
+        new Chart(ctxZeroExport, {
+            type: 'line',
+            data: {
+                labels: timeLabelsWrapped,
+                datasets: [
+                    {
+                        label: wrapLabel('Theoretical Yield (ศักยภาพแดดจริง)'),
+                        data: [15, 35, 55, 75, 85, 80, 65, 45, 25, 10],
+                        borderColor: '#94A3B8',
+                        borderDash: [5, 5],
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    },
+                    {
+                        label: wrapLabel('Building Consumption (ความต้องการใช้ไฟ)'),
+                        data: [20, 25, 40, 42, 45, 40, 38, 30, 25, 20],
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: wrapLabel('Actual PV Yield (ไฟที่ผลิตและจ่ายจริง)'),
+                        data: [15, 25, 40, 42, 45, 40, 38, 30, 25, 10],
+                        borderColor: '#F59E0B',
+                        backgroundColor: '#F59E0B',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#F59E0B',
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { family: 'Sarabun' }, padding: 20 } },
+                    tooltip: commonTooltipConfig
+                },
+                scales: {
+                    x: { ticks: { font: { family: 'Sarabun' } }, grid: { display: false } },
+                    y: { 
+                        title: { display: true, text: 'Power (kW)', font: { family: 'Sarabun' } },
+                        ticks: { font: { family: 'Sarabun' } },
+                        grid: { borderDash: [4, 4] }
+                    }
+                },
+                interaction: { mode: 'index', intersect: false }
+            }
+        });
+
+        function openReadme() {
+            const modal = document.getElementById('readmeModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReadme() {
+            const modal = document.getElementById('readmeModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('readmeModal');
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeReadme();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
