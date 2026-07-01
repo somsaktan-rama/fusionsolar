@@ -15,166 +15,144 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; }
-        /* ขยายความสูงของกราฟให้แสดงผลแบบเต็มหน้าจอ (สัดส่วน) */
-        .chart-wrapper { position: relative; height: 60vh; min-height: 450px; width: 100%; }
-        .tab-nav-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
-        .tab-nav-inactive { color: #64748b; border-bottom: 3px solid transparent; }
-        .tab-nav-inactive:hover { color: #2563eb; border-bottom: 3px solid #e2e8f0; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f1f5f9; }
+        .chart-wrapper { position: relative; height: 50vh; min-height: 350px; width: 100%; }
         .page-hidden { display: none; }
     </style>
 </head>
-<body class="text-gray-800 bg-slate-50 min-h-screen flex flex-col">
+<body class="text-gray-800 min-h-screen flex flex-col">
 
     <script>
         // *** ใส่ URL Web App จาก Google Apps Script ตรงนี้ ***
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwvcMNy4CfvyU0pDE48zZ0J82mBWV-FHd33nLpG4HnHhkj8HZbMfsWfWgikh9kcO4I/exec";
     </script>
 
-    <nav class="bg-white shadow-sm border-b px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm border-b px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-0 z-50">
         <div class="flex items-center space-x-3">
             <div class="bg-blue-600 p-2 rounded-lg text-white">
-                <i data-lucide="activity" class="w-6 h-6"></i>
+                <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Solar Monitoring & Analytics</h1>
-                <p class="text-xs text-gray-500">ระบบติดตามประสิทธิภาพและวิเคราะห์พลังงานจำเพาะรายวัน</p>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Solar Monitoring Dashboard</h1>
+                <p class="text-xs text-gray-500">ระบบติดตามประสิทธิภาพพลังงานรายวัน</p>
             </div>
         </div>
         
-        <div class="flex bg-slate-100 p-1 rounded-xl border">
-            <button onclick="switchPage('analytics')" id="nav-analytics" class="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150 bg-white text-blue-600 shadow-sm flex items-center">
-                <i data-lucide="bar-chart-3" class="w-4 h-4 mr-2"></i> แดชบอร์ดวิเคราะห์
-            </button>
-            <button onclick="switchPage('upload')" id="nav-upload" class="px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150 text-gray-600 hover:text-blue-600 flex items-center">
-                <i data-lucide="upload-cloud" class="w-4 h-4 mr-2"></i> นำเข้าข้อมูล
-            </button>
-        </div>
-    </nav>
-
-    <div id="page-analytics" class="container mx-auto px-4 py-6 max-w-7xl flex-grow">
-        
-        <!-- แถบ Tabs และ ตัวเลือกเดือน -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-200 pb-2 gap-4">
-            <div class="flex space-x-4 sm:space-x-6 overflow-x-auto w-full md:w-auto scrollbar-hide">
-                <button onclick="switchSubTab('roi')" id="subtab-roi" class="py-3 px-2 tab-nav-active transition-all flex items-center text-sm whitespace-nowrap">
-                    <i data-lucide="pie-chart" class="w-4 h-4 mr-2"></i> 1. Financial & ROI
-                </button>
-                <button onclick="switchSubTab('health')" id="subtab-health" class="py-3 px-2 tab-nav-inactive transition-all flex items-center text-sm whitespace-nowrap">
-                    <i data-lucide="shield-check" class="w-4 h-4 mr-2"></i> 2. System Health & Maintenance
-                </button>
-                <button onclick="switchSubTab('battery')" id="subtab-battery" class="py-3 px-2 tab-nav-inactive transition-all flex items-center text-sm whitespace-nowrap">
-                    <i data-lucide="battery-charging" class="w-4 h-4 mr-2"></i> 3. Battery Management
-                </button>
-            </div>
-            
-            <div class="flex items-center bg-white p-1 rounded-lg shadow-sm border border-gray-200 shrink-0 w-full md:w-auto">
-                <i data-lucide="calendar" class="w-4 h-4 text-gray-400 ml-3"></i>
-                <select id="monthFilter" onchange="onMonthChange()" class="bg-transparent border-none text-sm font-medium text-blue-700 focus:ring-0 outline-none w-full py-1.5 px-3 cursor-pointer">
+        <div class="flex space-x-4 items-center">
+            <div class="flex items-center bg-slate-50 p-1.5 rounded-lg border border-gray-200">
+                <i data-lucide="calendar" class="w-4 h-4 text-gray-500 ml-2"></i>
+                <select id="monthFilter" onchange="onMonthChange()" class="bg-transparent border-none text-sm font-medium text-blue-700 focus:ring-0 outline-none w-full py-1 px-2 cursor-pointer">
                     <option value="">กำลังโหลดข้อมูล...</option>
                 </select>
             </div>
-        </div>
-
-        <!-- Group 1: Financial & ROI (แสดงผลเฉพาะสรุปตัวเลข) -->
-        <div id="sec-roi" class="block space-y-6 animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Total PV Yield</span>
-                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="sun" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-gray-900" id="kpi-yield">0.0 <span class="text-base font-normal text-gray-500">kWh</span></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Loss Due to Limit</span>
-                        <div class="p-2 bg-red-50 text-red-600 rounded-lg"><i data-lucide="trending-down" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-red-500" id="kpi-loss">0.0 <span class="text-base font-normal text-gray-500">kWh</span></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Avg Self-consumption</span>
-                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-emerald-600" id="kpi-selfcons">0.0%</div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Total Grid Import</span>
-                        <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i data-lucide="git-pull-request" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-amber-600" id="kpi-import">0.0 <span class="text-base font-normal text-gray-500">kWh</span></div>
-                </div>
-            </div>
-            <div class="text-center py-10 text-gray-400">
-                <i data-lucide="layout-dashboard" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
-                <p>หมวดหมู่นี้แสดงเฉพาะตัวเลขสรุปรายเดือน ไม่มีกราฟแสดงผล</p>
+            <div class="flex bg-slate-100 p-1 rounded-xl border">
+                <button onclick="switchPage('analytics')" id="nav-analytics" class="px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm flex items-center">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4 mr-2"></i> แดชบอร์ด
+                </button>
+                <button onclick="switchPage('upload')" id="nav-upload" class="px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:text-blue-600 flex items-center">
+                    <i data-lucide="upload-cloud" class="w-4 h-4 mr-2"></i> นำเข้าข้อมูล
+                </button>
             </div>
         </div>
+    </nav>
 
-        <!-- Group 2: System Health & Maintenance (กราฟเฉพาะ Specific Energy เต็มจอ) -->
-        <div id="sec-health" class="hidden space-y-6 animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-2">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Average Performance Ratio (PR)</span>
-                        <div class="p-1.5 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="activity" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-gray-900" id="kpi-pr">0.0%</div>
+    <!-- Page: Analytics -->
+    <div id="page-analytics" class="container mx-auto px-4 py-6 max-w-7xl flex-grow">
+        
+        <!-- KPI Summary (สรุปด้านบน) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-blue-500">
+                <div class="flex justify-between items-center text-gray-500 mb-2">
+                    <span class="text-xs font-bold uppercase">Total PV Yield</span>
+                    <i data-lucide="sun" class="w-4 h-4 text-blue-500"></i>
                 </div>
+                <div class="text-2xl font-bold text-gray-800" id="kpi-yield">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
+                <p class="text-[10px] text-gray-400 mt-1">ผลรวมพลังงานที่ผลิตได้ในเดือนนี้</p>
             </div>
             
-            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center">
-                    <span class="w-2 h-6 bg-purple-600 rounded-full mr-3"></span>กราฟพลังงานจำเพาะรายวัน (Specific Energy - kWh/kWp)
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500">
+                <div class="flex justify-between items-center text-gray-500 mb-2">
+                    <span class="text-xs font-bold uppercase">Total Consumption</span>
+                    <i data-lucide="home" class="w-4 h-4 text-emerald-500"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="kpi-cons">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
+                <p class="text-[10px] text-gray-400 mt-1">ผลรวมพลังงานที่ใช้ไปในเดือนนี้</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500">
+                <div class="flex justify-between items-center text-gray-500 mb-2">
+                    <span class="text-xs font-bold uppercase">Total Grid Import</span>
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="kpi-import">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
+                <p class="text-[10px] text-gray-400 mt-1">ผลรวมการดึงไฟจากการไฟฟ้าในเดือนนี้</p>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-purple-500">
+                <div class="flex justify-between items-center text-gray-500 mb-2">
+                    <span class="text-xs font-bold uppercase">Avg Specific Energy</span>
+                    <i data-lucide="bar-chart" class="w-4 h-4 text-purple-500"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="kpi-spec">0.00 <span class="text-sm font-normal text-gray-500">kWh/kWp</span></div>
+                <p class="text-[10px] text-gray-400 mt-1">ค่าเฉลี่ยประสิทธิภาพแผงในเดือนนี้</p>
+            </div>
+        </div>
+
+        <!-- Charts Section (แสดงแยกกัน) -->
+        <div class="space-y-6">
+            
+            <!-- Graph 1: PV Yield -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
+                    <span class="w-2 h-5 bg-blue-500 rounded-full mr-2"></span> 1. กราฟพลังงานที่ผลิตได้รายวัน (PV Yield)
                 </h3>
-                <p class="text-sm text-gray-500 mb-4">* สามารถคลิกชื่อไซต์เพื่อเปิด/ปิด แถบกราฟ และวันเสาร์-อาทิตย์จะถูกเน้นด้วยสีแดงบนแกนวันที่</p>
-                <!-- พื้นที่แสดงกราฟหลัก ขยายเต็มจอ -->
-                <div class="chart-wrapper"><canvas id="chartSpecific"></canvas></div>
+                <p class="text-xs text-gray-400 mb-4">* สามารถคลิกที่ชื่อไซต์ด้านล่างเพื่อเปิด/ปิดกราฟ (วันหยุดเสาร์-อาทิตย์จะแสดงแกนวันที่เป็นสีแดง)</p>
+                <div class="chart-wrapper"><canvas id="chartYield"></canvas></div>
             </div>
-        </div>
 
-        <!-- Group 3: Battery Management -->
-        <div id="sec-battery" class="hidden animate-fade-in">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Total Battery Charge</span>
-                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i data-lucide="battery-charging" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-gray-900" id="kpi-charge">0.0 <span class="text-base font-normal text-gray-500">kWh</span></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <div class="flex justify-between items-center text-gray-400 mb-3">
-                        <span class="text-xs font-semibold uppercase tracking-wider">Total Battery Discharge</span>
-                        <div class="p-2 bg-pink-50 text-pink-600 rounded-lg"><i data-lucide="battery-medium" class="w-5 h-5"></i></div>
-                    </div>
-                    <div class="text-3xl font-bold text-gray-900" id="kpi-discharge">0.0 <span class="text-base font-normal text-gray-500">kWh</span></div>
-                </div>
+            <!-- Graph 2: Consumption -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
+                    <span class="w-2 h-5 bg-emerald-500 rounded-full mr-2"></span> 2. กราฟพลังงานที่บ้าน/อาคารใช้ไปรายวัน (Consumption)
+                </h3>
+                <p class="text-xs text-gray-400 mb-4">* เปรียบเทียบปริมาณการใช้ไฟฟ้าของแต่ละไซต์</p>
+                <div class="chart-wrapper"><canvas id="chartCons"></canvas></div>
             </div>
-            <div class="text-center py-12 text-gray-400">
-                <i data-lucide="battery" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
-                <p>หมวดหมู่นี้แสดงเฉพาะตัวเลขสรุปพลังงานกักเก็บรวม ไม่มีกราฟแสดงผล</p>
+            
+            <!-- Graph 3: Grid Import -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
+                    <span class="w-2 h-5 bg-amber-500 rounded-full mr-2"></span> 3. กราฟการดึงไฟจากการไฟฟ้ามาเสริมรายวัน (Grid Import)
+                </h3>
+                <p class="text-xs text-gray-400 mb-4">* แสดงปริมาณไฟฟ้าที่ต้องซื้อเพิ่มจากการไฟฟ้า</p>
+                <div class="chart-wrapper"><canvas id="chartImport"></canvas></div>
             </div>
-        </div>
 
+            <!-- Graph 4: Specific Energy -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                <h3 class="text-lg font-bold text-gray-800 mb-1 flex items-center">
+                    <span class="w-2 h-5 bg-purple-500 rounded-full mr-2"></span> 4. กราฟพลังงานจำเพาะรายวัน (Specific Energy)
+                </h3>
+                <p class="text-xs text-gray-400 mb-4">* แสดงประสิทธิภาพการผลิตต่อ 1 กิโลวัตต์ติดตั้ง (ยิ่งสูงยิ่งดี)</p>
+                <div class="chart-wrapper"><canvas id="chartSpec"></canvas></div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- หน้าต่างนำเข้าข้อมูล (Upload) -->
+    <!-- Page: Upload -->
     <div id="page-upload" class="container mx-auto px-4 py-12 max-w-xl page-hidden flex-grow">
         <div class="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
             <div class="text-center mb-6">
                 <div class="inline-flex bg-blue-50 text-blue-600 p-3 rounded-full mb-3"><i data-lucide="file-spreadsheet" class="w-8 h-8"></i></div>
                 <h2 class="text-xl font-bold text-gray-900">อัปโหลดรายงานประจำวัน</h2>
-                <p class="text-xs text-gray-400 mt-1">กรุณานำเข้าไฟล์รายงานรูปแบบ Excel (.xlsx)</p>
             </div>
             
             <div class="space-y-5">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">เลือกชื่อไซต์งานปลายทาง</label>
-                    <select id="siteSelect" class="w-full p-3 bg-slate-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition text-sm">
+                    <select id="siteSelect" class="w-full p-3 bg-slate-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                         <option value="Nakornin12kw">Nakornin12kw</option>
                         <option value="Klong3150kw">Klong3150kw</option>
                         <option value="Ratchapherk50kw">Ratchapherk50kw</option>
@@ -182,52 +160,34 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">เลือกไฟล์รายงาน</label>
-                    <div id="dropzone" class="border-2 border-dashed border-gray-300 bg-slate-50 hover:bg-slate-100 transition rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer relative">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">เลือกไฟล์รายงาน Excel</label>
+                    <div id="dropzone" class="border-2 border-dashed border-gray-300 bg-slate-50 hover:bg-slate-100 rounded-xl p-6 flex flex-col items-center justify-center relative">
                         <i data-lucide="cloud-lightning" class="w-8 h-8 text-gray-400 mb-2"></i>
-                        <span class="text-xs text-gray-500 text-center px-4">คลิกที่นี่เพื่อเลือกไฟล์</span>
+                        <span class="text-xs text-gray-500 text-center">คลิกที่นี่เพื่อเลือกไฟล์</span>
                         <input type="file" id="fileInput" accept=".xlsx, .xls" multiple class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateFileList()"/>
                     </div>
                     <div id="fileListDisplay" class="mt-2 space-y-1 max-h-32 overflow-y-auto"></div>
                 </div>
-                <button id="uploadBtn" onclick="handleBulkUpload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md shadow-blue-100 transition duration-150 text-sm flex items-center justify-center">
-                    <i data-lucide="upload" class="w-4 h-4 mr-2"></i> เริ่มอัปโหลดข้อมูล
+                <button id="uploadBtn" onclick="handleBulkUpload()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-md transition text-sm">
+                    เริ่มอัปโหลดข้อมูล
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- CSS Animation เบาๆ -->
-    <style>
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-    </style>
-
     <script>
-        let chartSpecInstance = null;
+        let chartYieldInst = null, chartConsInst = null, chartImportInst = null, chartSpecInst = null;
         let rawDashboardData = [];
         const themeColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
 
         function switchPage(pageId) {
             ['analytics', 'upload'].forEach(p => {
                 document.getElementById(`page-${p}`).classList.add('page-hidden');
-                document.getElementById(`nav-${p}`).className = "px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150 text-gray-600 hover:text-blue-600 flex items-center";
+                document.getElementById(`nav-${p}`).className = "px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:text-blue-600 flex items-center";
             });
             document.getElementById(`page-${pageId}`).classList.remove('page-hidden');
-            document.getElementById(`nav-${pageId}`).className = "px-5 py-2 rounded-lg text-sm font-medium transition-all duration-150 bg-white text-blue-600 shadow-sm flex items-center";
-            
+            document.getElementById(`nav-${pageId}`).className = "px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm flex items-center";
             if(pageId === 'analytics') fetchDataFromGAS();
-        }
-
-        function switchSubTab(tabName) {
-            ['roi', 'health', 'battery'].forEach(t => {
-                document.getElementById(`sec-${t}`).style.display = 'none';
-                document.getElementById(`subtab-${t}`).className = 'py-3 px-2 tab-nav-inactive transition-all flex items-center text-sm whitespace-nowrap';
-            });
-            document.getElementById(`sec-${tabName}`).style.display = 'block';
-            document.getElementById(`subtab-${tabName}`).className = 'py-3 px-2 tab-nav-active transition-all flex items-center text-sm whitespace-nowrap';
         }
 
         function updateFileList() {
@@ -242,8 +202,7 @@
 
         async function fetchDataFromGAS() {
             if (GAS_API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-                Swal.fire('แจ้งเตือน', 'กรุณาระบุ GAS_API_URL ก่อนใช้งาน', 'warning');
-                return;
+                Swal.fire('แจ้งเตือน', 'กรุณาระบุ GAS_API_URL ในโค้ดก่อนใช้งาน', 'warning'); return;
             }
             Swal.fire({ title: 'กำลังดึงข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             try {
@@ -251,15 +210,11 @@
                 if (!response.ok) throw new Error('Network Error');
                 rawDashboardData = await response.json();
                 Swal.close();
-                
                 populateMonthSelector();
                 processAndRenderAnalytics();
-            } catch (error) {
-                Swal.fire('ข้อผิดพลาด', error.message, 'error');
-            }
+            } catch (error) { Swal.fire('ข้อผิดพลาด', error.message, 'error'); }
         }
 
-        // สร้างตัวเลือกเดือนลงใน Dropdown
         function populateMonthSelector() {
             if (!rawDashboardData || rawDashboardData.length === 0) return;
             const months = [...new Set(rawDashboardData.map(item => item.date.substring(0, 7)))].sort().reverse();
@@ -270,104 +225,86 @@
             const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             months.forEach(m => {
                 const parts = m.split('-');
-                const label = `${thaiMonths[parseInt(parts[1]) - 1]} ${parts[0]}`;
-                selector.innerHTML += `<option value="${m}">${label}</option>`;
+                selector.innerHTML += `<option value="${m}">${thaiMonths[parseInt(parts[1]) - 1]} ${parts[0]}</option>`;
             });
-            
             if (months.includes(currentSelection)) selector.value = currentSelection;
             else selector.value = months[0];
         }
 
-        function onMonthChange() {
-            processAndRenderAnalytics();
-        }
+        function onMonthChange() { processAndRenderAnalytics(); }
 
-        // คัดกรองข้อมูลรายวันตามเดือนที่เลือก และวาดกราฟ
         function processAndRenderAnalytics() {
             if (!rawDashboardData || rawDashboardData.length === 0) return;
 
             const selectedMonth = document.getElementById('monthFilter').value;
-            // กรองเอาเฉพาะข้อมูลรายวันที่อยู่ในเดือนที่เลือก
             const filteredData = rawDashboardData.filter(item => item.date.startsWith(selectedMonth));
 
-            // ตัวแปรสำหรับสรุป KPI ทั้งเดือน
-            let totalYield = 0, totalLoss = 0, totalImport = 0, sumSelfCons = 0, sumPR = 0, totalCharge = 0, totalDischarge = 0;
-            let selfConsCount = 0, prCount = 0;
-
+            // คำนวณ KPI สรุปด้านบน
+            let sumYield = 0, sumCons = 0, sumImport = 0, sumSpec = 0, specCount = 0;
             filteredData.forEach(item => {
-                totalYield += item.pvYield || 0;
-                totalLoss += item.loss || 0;
-                totalImport += item.importGrid || 0;
-                totalCharge += item.charge || 0;
-                totalDischarge += item.discharge || 0;
-                
-                if (item.selfConsRate > 0) { sumSelfCons += item.selfConsRate; selfConsCount++; }
-                if (item.pr > 0) { sumPR += item.pr; prCount++; }
+                sumYield += item.pvYield || 0;
+                sumCons += item.consumption || 0;
+                sumImport += item.importGrid || 0;
+                if (item.specificEnergy > 0) { sumSpec += item.specificEnergy; specCount++; }
             });
 
-            document.getElementById('kpi-yield').innerHTML = `${totalYield.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
-            document.getElementById('kpi-loss').innerHTML = `${totalLoss.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
-            document.getElementById('kpi-import').innerHTML = `${totalImport.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
-            document.getElementById('kpi-selfcons').innerText = selfConsCount > 0 ? (sumSelfCons / selfConsCount).toFixed(1) + '%' : '0.0%';
-            document.getElementById('kpi-pr').innerText = prCount > 0 ? (sumPR / prCount).toFixed(1) + '%' : '0.0%';
-            document.getElementById('kpi-charge').innerHTML = `${totalCharge.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
-            document.getElementById('kpi-discharge').innerHTML = `${totalDischarge.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
+            document.getElementById('kpi-yield').innerHTML = `${sumYield.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
+            document.getElementById('kpi-cons').innerHTML = `${sumCons.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
+            document.getElementById('kpi-import').innerHTML = `${sumImport.toFixed(1)} <span class="text-sm font-normal text-gray-500">kWh</span>`;
+            document.getElementById('kpi-spec').innerHTML = specCount > 0 ? `${(sumSpec / specCount).toFixed(2)} <span class="text-sm font-normal text-gray-500">kWh/kWp</span>` : '0.00';
 
-            // ดึงวันที่ทั้งหมดในเดือนนี้ที่มีข้อมูล
+            // เตรียมแกน X (วันที่ และ วันหยุด)
             const uniqueDates = [...new Set(filteredData.map(item => item.date))].sort();
-            const uniqueSites = [...new Set(rawDashboardData.map(item => item.siteName))]; // ใช้ Site ทั้งหมดสร้าง Legend
+            const uniqueSites = [...new Set(rawDashboardData.map(item => item.siteName))];
 
             const thaiMonths = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
             const daysThai = ['อา.', 'จ.', 'อ.', 'พ.', 'พฤ.', 'ศ.', 'ส.'];
-
-            // เตรียม Label แกน X (เช่น "12 มิ.ย. (อ.)")
             const chartLabels = uniqueDates.map(d => {
                 const dateObj = new Date(d);
-                const day = dateObj.getDay();
-                const parts = d.split('-');
-                return `${parseInt(parts[2])} ${thaiMonths[parseInt(parts[1])-1]} (${daysThai[day]})`;
+                return `${parseInt(d.split('-')[2])} ${thaiMonths[parseInt(d.split('-')[1])-1]} (${daysThai[dateObj.getDay()]})`;
             });
 
-            // สร้างชุดข้อมูลกราฟ Specific Energy เท่านั้น
-            const datasetsSpec = uniqueSites.map((site, idx) => {
-                const baseColor = themeColors[idx % themeColors.length];
-                const points = uniqueDates.map(d => {
-                    const record = filteredData.find(r => r.siteName === site && r.date === d);
-                    return record ? record.specificEnergy : 0;
+            // ฟังก์ชันตัวช่วยดึงข้อมูลเข้าแต่ละกราฟ
+            const buildDataset = (key) => {
+                return uniqueSites.map((site, idx) => {
+                    const data = uniqueDates.map(d => {
+                        const record = filteredData.find(r => r.siteName === site && r.date === d);
+                        return record ? record[key] : 0;
+                    });
+                    return { label: site, data: data, backgroundColor: themeColors[idx % themeColors.length], borderRadius: 3 };
                 });
-                return { label: site, data: points, backgroundColor: baseColor, borderRadius: 3 };
-            });
+            };
 
-            renderSpecificEnergyChart(chartLabels, datasetsSpec);
+            renderChart('chartYield', chartYieldInst, chartLabels, buildDataset('pvYield'), 'พลังงาน (kWh)');
+            renderChart('chartCons', chartConsInst, chartLabels, buildDataset('consumption'), 'พลังงาน (kWh)');
+            renderChart('chartImport', chartImportInst, chartLabels, buildDataset('importGrid'), 'พลังงาน (kWh)');
+            renderChart('chartSpec', chartSpecInst, chartLabels, buildDataset('specificEnergy'), 'kWh/kWp');
         }
 
-        // วาดกราฟและเน้นสีแกนวันที่เป็นสีแดงเมื่อเป็นเสาร์-อาทิตย์
-        function renderSpecificEnergyChart(labels, datasets) {
-            if (chartSpecInstance) chartSpecInstance.destroy();
-            chartSpecInstance = new Chart(document.getElementById('chartSpecific').getContext('2d'), {
-                type: 'bar', 
-                data: { labels: labels, datasets: datasets },
+        function renderChart(canvasId, instance, labels, datasets, yTitle) {
+            if (window[canvasId + 'Inst']) window[canvasId + 'Inst'].destroy();
+            
+            window[canvasId + 'Inst'] = new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'bar', data: { labels: labels, datasets: datasets },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { font: { family: 'Sarabun', size: 14 }, padding: 20 } },
+                        legend: { position: 'bottom', labels: { font: { family: 'Sarabun' } } },
                         tooltip: { mode: 'index', intersect: false, titleFont: { family: 'Sarabun' }, bodyFont: { family: 'Sarabun' } }
                     },
                     scales: {
                         x: {
                             grid: { display: false },
                             ticks: {
-                                font: { family: 'Sarabun', size: 13 },
-                                // เปลี่ยนสีตัวอักษรหากชื่อวันมี (ส.) หรือ (อา.)
-                                color: function(context) {
-                                    const lbl = context.tick.label || '';
-                                    if (lbl.includes('(ส.)') || lbl.includes('(อา.)')) return '#ef4444'; 
-                                    return '#64748b'; 
+                                font: { family: 'Sarabun', size: 12 },
+                                color: (ctx) => {
+                                    const lbl = ctx.tick.label || '';
+                                    return (lbl.includes('(ส.)') || lbl.includes('(อา.)')) ? '#ef4444' : '#64748b'; 
                                 }
                             }
                         },
                         y: {
-                            title: { display: true, text: 'พลังงานจำเพาะ (kWh/kWp)', font: { family: 'Sarabun' } },
+                            title: { display: true, text: yTitle, font: { family: 'Sarabun' } },
                             grid: { color: '#e2e8f0', borderDash: [4, 4] },
                             ticks: { font: { family: 'Sarabun' } }
                         }
@@ -376,41 +313,35 @@
             });
         }
 
-        const convertFileToBase64 = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader(); reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result); reader.onerror = (e) => reject(e);
-            });
-        };
+        const convertFileToBase64 = (file) => new Promise((res, rej) => {
+            const reader = new FileReader(); reader.readAsDataURL(file);
+            reader.onload = () => res(reader.result); reader.onerror = rej;
+        });
 
         async function handleBulkUpload() {
-            const fileInput = document.getElementById('fileInput');
+            const files = document.getElementById('fileInput').files;
             const siteSelect = document.getElementById('siteSelect').value;
-            const files = fileInput.files;
             if (files.length === 0) return Swal.fire({ icon: 'warning', title: 'กรุณาแนบไฟล์' });
             if (GAS_API_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") return Swal.fire('แจ้งเตือน', 'กรุณาระบุลิงก์ API', 'warning');
 
             Swal.fire({ title: 'กำลังเตรียมส่งข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            let successCounter = 0, failCounter = 0;
+            let suc = 0, fail = 0;
 
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                Swal.update({ title: `อัปโหลด (${i + 1}/${files.length})`, text: `ไฟล์: ${file.name}` });
+                Swal.update({ title: `อัปโหลด (${i + 1}/${files.length})`, text: `ไฟล์: ${files[i].name}` });
                 try {
-                    const base64String = await convertFileToBase64(file);
-                    const apiResponse = await fetch(GAS_API_URL, {
-                        method: 'POST', body: JSON.stringify({ base64Data: base64String, fileName: file.name, siteName: siteSelect })
-                    });
-                    const serverResult = await apiResponse.json();
-                    if (serverResult.success) successCounter++; else failCounter++;
-                } catch (error) { failCounter++; }
+                    const base64 = await convertFileToBase64(files[i]);
+                    const res = await fetch(GAS_API_URL, { method: 'POST', body: JSON.stringify({ base64Data: base64, fileName: files[i].name, siteName: siteSelect }) });
+                    const result = await res.json();
+                    if (result.success) suc++; else fail++;
+                } catch (e) { fail++; }
             }
 
-            if (failCounter === 0) {
-                Swal.fire({ icon: 'success', title: 'สำเร็จ', text: `บันทึกข้อมูลครบ ${successCounter} ไฟล์` });
-                fileInput.value = ''; document.getElementById('fileListDisplay').innerHTML = '';
+            if (fail === 0) {
+                Swal.fire({ icon: 'success', title: 'สำเร็จ', text: `บันทึกข้อมูลครบ ${suc} ไฟล์` });
+                document.getElementById('fileInput').value = ''; document.getElementById('fileListDisplay').innerHTML = '';
             } else {
-                Swal.fire({ icon: 'warning', title: 'เสร็จสิ้นแบบมีข้อผิดพลาด', text: `สำเร็จ ${successCounter} / ล้มเหลว ${failCounter}` });
+                Swal.fire({ icon: 'warning', title: 'เสร็จสิ้นแบบมีข้อผิดพลาด', text: `สำเร็จ ${suc} / ล้มเหลว ${fail}` });
             }
         }
 
