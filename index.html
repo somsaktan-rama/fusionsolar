@@ -31,7 +31,7 @@
                 <i data-lucide="bar-chart-2" class="w-6 h-6"></i>
             </div>
             <div>
-                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Solar Monitoring Dashboard 1.00</h1>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">Solar Monitoring Dashboard 1.01</h1>
                 <p class="text-xs text-gray-500">ระบบติดตามประสิทธิภาพพลังงานรายวัน</p>
             </div>
         </div>
@@ -94,8 +94,18 @@
                     <span class="text-xs font-bold uppercase">Total PV Yield</span>
                     <i data-lucide="sun" class="w-4 h-4 text-blue-500"></i>
                 </div>
+               
                 <div class="text-2xl font-bold text-gray-800" id="kpi-yield">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
                 <p class="text-[10px] text-gray-400 mt-1">พลังงานที่ผลิตได้ทั้งหมดตามตัวกรอง</p>
+                </div>
+
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500 transition-all hover:shadow-md">
+                <div class="flex justify-between items-center text-gray-500 mb-2">
+                    <span class="text-xs font-bold uppercase">Total Grid Import</span>
+                    <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div class="text-2xl font-bold text-gray-800" id="kpi-import">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
+                <p class="text-[10px] text-gray-400 mt-1">การดึงไฟจากการไฟฟ้ามาเสริมรวม</p>
             </div>
             
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-emerald-500 transition-all hover:shadow-md">
@@ -105,15 +115,6 @@
                 </div>
                 <div class="text-2xl font-bold text-gray-800" id="kpi-cons">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
                 <p class="text-[10px] text-gray-400 mt-1">พลังงานที่ใช้ไปทั้งหมดตามตัวกรอง</p>
-            </div>
-
-            <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-amber-500 transition-all hover:shadow-md">
-                <div class="flex justify-between items-center text-gray-500 mb-2">
-                    <span class="text-xs font-bold uppercase">Total Grid Import</span>
-                    <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
-                </div>
-                <div class="text-2xl font-bold text-gray-800" id="kpi-import">0.0 <span class="text-sm font-normal text-gray-500">kWh</span></div>
-                <p class="text-[10px] text-gray-400 mt-1">การดึงไฟจากการไฟฟ้ามาเสริมรวม</p>
             </div>
 
             <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 border-l-4 border-l-purple-500 transition-all hover:shadow-md">
